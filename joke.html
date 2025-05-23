@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Random Joke Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Neue', cursive;
+      background: linear-gradient(135deg, #fceabb, #f8b500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    button {
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f57c00;
+    }
+
+    .joke-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border: 2px dashed #ff9800;
+      border-radius: 10px;
+      background-color: #fff8e1;
+      color: #333;
+      min-height: 80px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .joke-box.show {
+      opacity: 1;
+    }
+
+    .setup {
+      font-weight: bold;
+    }
+
+    .punchline {
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .loading {
+      font-style: italic;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Need a Laugh?</h1>
+    <button onclick="getJoke()">Tell Me a Joke</button>
+    <div class="joke-box" id="jokeBox">
+      <!-- Joke appears here -->
+    </div>
+  </div>
+
+  <!-- Rimshot sound -->
+  <audio id="rimshot" src="https://www.soundjay.com/human/sounds/applause-4.mp3" preload="auto"></audio>
+
+  <script>
+    function getJoke() {
+      const jokeBox = document.getElementById('jokeBox');
+      const rimshot = document.getElementById('rimshot');
+
+      // Show loading
+      jokeBox.classList.remove('show');
+      jokeBox.innerHTML = '<span class="loading">Thinking of a funny one...</span>';
+
+      fetch('https://official-joke-api.appspot.com/random_joke')
+        .then(response => response.json())
+        .then(data => {
+          setTimeout(() => {
+            // Display the joke
+            jokeBox.innerHTML = `
+              <span class="setup">${data.setup}</span>
+              <span class="punchline">${data.punchline}</span>
+              <button onclick="getJoke()" style="margin-top:1rem;">Another one!</button>
+            `;
+            jokeBox.classList.add('show');
+            rimshot.play();
+          }, 1000); // simulate a pause before showing the joke
+        })
+        .catch(error => {
+          jokeBox.innerHTML = `<span class="loading">Oops! Couldn't fetch a joke.</span>`;
+          console.error('Error:', error);
+        });
+    }
+  </script>
+
+</body>
+</html>
